@@ -5,22 +5,22 @@
       <!-- Formulário de Filtro -->  
       <form @submit.prevent="consultarChamados" class="consulta-form">  
         <div class="form-group">  
-          <label for="dataInicio">Data Abertura Início:</label>  
+          <label for="dataInicio">Data inicial da abertura:</label>  
           <input type="date" v-model="filtros.dataAberturaInicio" class="form-control" />  
         </div>  
   
         <div class="form-group">  
-          <label for="dataFim">Data Abertura Fim:</label>  
+          <label for="dataFim">Data final da abertura:</label>  
           <input type="date" v-model="filtros.dataAberturaFim" class="form-control" />  
         </div>  
   
         <div class="form-group">  
-          <label for="dataFechamentoInicio">Data Fechamento Início:</label>  
+          <label for="dataFechamentoInicio">Data inicial do fechamento:</label>  
           <input type="date" v-model="filtros.dataFechamentoInicio" class="form-control" />  
         </div>  
   
         <div class="form-group">  
-          <label for="dataFechamentoFim">Data Fechamento Fim:</label>  
+          <label for="dataFechamentoFim">Data final do fechamento:</label>  
           <input type="date" v-model="filtros.dataFechamentoFim" class="form-control" />  
         </div>  
   
@@ -38,6 +38,19 @@
           </select>  
         </div>  
   
+        <div class="form-group">  
+          <label for="departamento">Departamento:</label>  
+          <select v-model="filtros.departamento" class="form-control">  
+            <option value="">Todos</option> <!-- Option para não filtrar por departamento -->  
+            <option value="departamento-contabil">Departamento Contábil</option>  
+            <option value="departamento-extra-contabil">Departamento Extra Contábil</option>  
+            <option value="departamento-fiscal">Departamento Fiscal</option>  
+            <option value="departamento-pessoal">Departamento Pessoal</option>  
+            <option value="diretoria">Diretoria</option>  
+            <option value="financeiro">Financeiro</option>  
+          </select>  
+        </div>  
+  
         <button type="submit" class="btn-consultar">Consultar</button>  
       </form>  
   
@@ -46,7 +59,7 @@
         <h2>Resultados da Consulta:</h2>  
         <ul>  
           <li v-for="(chamado, index) in resultados" :key="index">  
-            <strong>{{ chamado.titulo }}</strong> - {{ chamado.responsavel }}   
+            <strong>{{ chamado.titulo }}</strong> - {{ chamado.responsavel }}  
             <div v-if="!chamado.aberto">  
               <p><strong>Fechado em:</strong> {{ chamado.dataFechamento }}</p>  
               <p class="tratamento-detalhe1"><strong>Tratamento Realizado:</strong></p>  
@@ -75,7 +88,8 @@
           dataFechamentoInicio: '',  
           dataFechamentoFim: '',  
           responsavel: '',  
-          aberto: null  
+          aberto: null,  
+          departamento: '' // Adicionado campo para filtro por departamento  
         },  
         resultados: []  
       };  
@@ -83,7 +97,7 @@
     methods: {  
       async consultarChamados() {  
         const db = getFirestore(app);  
-        let chamadosQuery = collection(db, 'chamados');  
+        const chamadosQuery = collection(db, 'chamados');  
         const conditions = [];  
   
         // Filtros para data de abertura  
@@ -109,6 +123,11 @@
         // Filtro pelo estado do chamado  
         if (this.filtros.aberto !== null) {  
           conditions.push(where('aberto', '==', this.filtros.aberto));  
+        }  
+  
+        // Filtro por departamento  
+        if (this.filtros.departamento) {  
+          conditions.push(where('departamento', '==', this.filtros.departamento));  
         }  
   
         const q = query(chamadosQuery, ...conditions);  
@@ -198,22 +217,23 @@
   }  
   
   .tratamento-detalhe {  
-    min-height: 5em; /* Aproximadamente 5 linhas de altura */  
+    min-height: 5em;  
     max-width: 100%;  
-    white-space: pre-wrap; /* Mantém quebras de linha do texto */  
-    overflow: hidden; /* Oculta qualquer texto que exceda a altura */  
-    word-break: break-word; /* Quebra palavras longas para evitar rolagem horizontal */  
+    white-space: pre-wrap;  
+    overflow: hidden;  
+    word-break: break-word;  
     padding: 0.5rem;  
     border: 1px solid #ddd;  
     border-radius: 4px;  
     background-color: #f4f4f4;  
   }  
+  
   .tratamento-detalhe1 {  
-    min-height: 1em; /* Aproximadamente 5 linhas de altura */  
+    min-height: 1em;  
     max-width: 100%;  
-    white-space: pre-wrap; /* Mantém quebras de linha do texto */  
-    overflow: hidden; /* Oculta qualquer texto que exceda a altura */  
-    word-break: break-word; /* Quebra palavras longas para evitar rolagem horizontal */  
+    white-space: pre-wrap;  
+    overflow: hidden;  
+    word-break: break-word;  
     padding: 0.5rem;  
     border: 1px solid #ddd;  
     border-radius: 4px;  
