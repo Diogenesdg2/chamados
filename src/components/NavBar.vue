@@ -1,57 +1,85 @@
-<!-- Navbar.vue -->  
 <template>  
-    <nav class="navbar">  
-      <ul class="nav-list">  
-        <li class="nav-item">  
-          <router-link to="/" class="nav-link">Home</router-link>  
-        </li>  
-        <li class="nav-item">  
-          <router-link to="/consultar" class="nav-link">Consultar</router-link>  
-        </li>  
-        <li class="nav-item">  
-          <router-link to="/manutencao" class="nav-link">Manutenção</router-link>  
-        </li>  
-      </ul>  
-    </nav>  
-  </template>  
-  
-  <script>  
-  export default {  
-    name: 'Navbar',  
+  <nav class="navbar">  
+    <ul class="nav-list">  
+      <li class="nav-item" v-if="loggedInUser">  
+        <router-link to="/cadastro" class="nav-link">Home</router-link>  
+      </li>  
+      <li class="nav-item" v-if="loggedInUser">  
+        <router-link to="/consultar" class="nav-link">Consultar</router-link>  
+      </li>  
+      <li class="nav-item" v-if="loggedInUser">  
+        <router-link to="/manutencao" class="nav-link">Manutenção</router-link>  
+      </li>  
+      <li class="nav-item" v-if="loggedInUser">  
+        <span class="nav-link">Bem-vindo, {{ loggedInUser }}</span>  
+      </li>  
+      <li class="nav-item" v-if="loggedInUser">  
+        <a href="#" @click.prevent="logOff" class="nav-link">Sair</a>  
+      </li>  
+    </ul>  
+  </nav>  
+</template>  
+
+<script>  
+import { ref, onMounted } from 'vue';  
+import { useRouter } from 'vue-router';  
+
+export default {  
+  name: 'Navbar',  
+  setup() {  
+    const router = useRouter();  
+    const loggedInUser = ref('');  
+
+    onMounted(() => {  
+      loggedInUser.value = localStorage.getItem('loggedInUser') || '';  
+      console.log('Logged In User:', loggedInUser.value);  
+    });  
+
+    const logOff = () => {  
+      localStorage.removeItem('loggedInUser');  
+      loggedInUser.value = '';   
+      router.push('/');  
+    };  
+
+    return {  
+      loggedInUser,  
+      logOff  
+    };  
   }  
-  </script>  
-  
-  <style scoped>  
-  .navbar {  
-    position: fixed; /* Fixa a barra de navegação no topo */  
-    top: 0;  
-    width: 100%; /* Largura total da tela */  
-    background-color: #007BFF;  
-    padding: 1rem;  
-    display: flex;  
-    justify-content: center;  
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);  
-    z-index: 1000; /* Garante que a navbar ficará sobre outros elementos */  
-  }  
-  
-  .nav-list {  
-    list-style-type: none;  
-    margin: 0;  
-    padding: 0;  
-    display: flex;  
-    gap: 2rem;  
-  }  
-  
-  .nav-item {}  
-  
-  .nav-link {  
-    color: white;  
-    text-decoration: none;  
-    font-weight: bold;  
-    transition: color 0.3s;  
-  }  
-  
-  .nav-link:hover {  
-    color: #ffdd57;  
-  }  
-  </style>
+}  
+</script>  
+
+<style scoped>  
+.navbar {  
+  position: fixed;   
+  top: 0;  
+  width: 100%;  
+  background-color: #007BFF;  
+  padding: 1rem;  
+  display: flex;  
+  justify-content: center;  
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);  
+  z-index: 1000;  
+}  
+
+.nav-list {  
+  list-style-type: none;  
+  margin: 0;  
+  padding: 0;  
+  display: flex;  
+  gap: 2rem;  
+}  
+
+.nav-item {}  
+
+.nav-link {  
+  color: white;  
+  text-decoration: none;  
+  font-weight: bold;  
+  transition: color 0.3s;  
+}  
+
+.nav-link:hover {  
+  color: #ffdd57;  
+}  
+</style>

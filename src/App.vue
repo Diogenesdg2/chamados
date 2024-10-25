@@ -1,9 +1,9 @@
 <template>  
   <div id="app">  
-    <!-- Navbar aparece em todas as views -->  
-    <Navbar />  
+    <!-- Navbar renderizada condicionalmente com base na rota -->  
+    <Navbar v-if="shouldShowNavbar" />  
 
-    <!-- Conteúdo principal tem margin-top suficiente para não sobrepor a navbar -->  
+    <!-- Conteúdo principal -->  
     <main class="main-content">  
       <router-view />  
     </main>  
@@ -17,6 +17,12 @@ export default {
   components: {  
     Navbar,  
   },  
+  computed: {  
+    shouldShowNavbar() {  
+      // Verifica se a rota atual não é a de login  
+      return this.$route.path !== '/login';  
+    }  
+  }  
 }  
 </script>  
 

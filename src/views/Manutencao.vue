@@ -170,6 +170,6 @@
   }  
   
   .btn-fechar:hover {  
-    background-color: #0056b3;  
+    background-color: black;  
   }  
   </style>
