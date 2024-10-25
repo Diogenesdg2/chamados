@@ -14,13 +14,17 @@
       </form>  
       
       <button class="btn-register" @click="toggleRegister">Cadastro</button>  
-    
+  
       <div v-if="showRegister" class="register-container">  
         <h2>Cadastro de Usuário</h2>  
         <form @submit.prevent="register">  
           <div class="form-group">  
             <label for="new-username">Novo Usuário:</label>  
             <input type="text" v-model="newUsername" class="form-control" required />  
+          </div>  
+          <div class="form-group">  
+            <label for="new-email">E-mail:</label>  
+            <input type="email" v-model="newEmail" class="form-control" required />  
           </div>  
           <div class="form-group">  
             <label for="new-password">Nova Senha:</label>  
@@ -43,6 +47,7 @@
         username: '',  
         password: '',  
         newUsername: '',  
+        newEmail: '', // Campo para o e-mail  
         newPassword: '',  
         showRegister: false  
       };  
@@ -91,12 +96,14 @@
           }  
     
           await addDoc(usuariosRef, {  
-            username: this.newUsername,  
+            username: this.newUsername,  // Nome do usuário armazenado conforme inserido  
+            email: this.newEmail, // Armazena o e-mail no Firestore  
             password: this.newPassword  
           });  
     
           alert('Cadastro bem-sucedido!');  
           this.newUsername = '';  
+          this.newEmail = ''; // Limpa o campo de e-mail  
           this.newPassword = '';  
           this.toggleRegister();  
         } catch (error) {  
@@ -144,6 +151,6 @@
   }  
   
   .btn-login:hover, .btn-register:hover, .btn-register-submit:hover {  
-    background-color: black;  
+    background-color: #0056b3;  
   }  
   </style>
