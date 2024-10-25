@@ -1,8 +1,9 @@
-{
-  "compilerOptions": {
-    "paths": {
-      "@/*": ["src/*"]
-    }
-  },
-  "exclude": ["node_modules", "dist"]
+{  
+  "compilerOptions": {  
+    "baseUrl": ".",  // Define a raiz do projeto como base para a resolução de módulos  
+    "paths": {  
+      "@/*": ["src/*"]  
+    }  
+  },  
+  "exclude": ["node_modules", "dist"]  
 }
