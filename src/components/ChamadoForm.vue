@@ -7,7 +7,7 @@
     </div>  
 
     <!-- Campo de responsável foi removido do formulário da interface -->  
-    
+
     <div class="form-group">  
       <label for="descricao">Descrição:</label>  
       <textarea v-model="chamado.descricao" class="form-control" required></textarea>  
@@ -67,13 +67,13 @@ export default {
     };  
   },  
   mounted() {  
-    this.setResponsavel();  // Define o responsável assim que o componente é montado  
+    this.setResponsavel();  
   },  
   methods: {  
     setResponsavel() {  
       const loggedInUser = localStorage.getItem('loggedInUser');  
       if (loggedInUser) {  
-        this.chamado.responsavel = loggedInUser; // Define o usuário logado como responsável  
+        this.chamado.responsavel = loggedInUser;  
       } else {  
         alert('Erro: Usuário não autenticado.');  
       }  
@@ -83,7 +83,6 @@ export default {
       const counterRef = doc(db, "counters", "chamadosCounter");  
 
       try {  
-        // Obtenha e incremente o número atual  
         const counterDoc = await getDoc(counterRef);  
         let currentNumber = 1;  
 
@@ -91,10 +90,8 @@ export default {
           currentNumber = counterDoc.data().currentNumber + 1;  
         }  
 
-        // Atualiza o contador no Firestore  
         await setDoc(counterRef, { currentNumber }, { merge: true });  
 
-        // Adiciona o novo chamado com o código  
         const novoChamado = {  
           ...this.chamado,  
           codigo: currentNumber,  
@@ -105,11 +102,25 @@ export default {
         this.codigo = novoChamado.codigo;  
 
         alert(`Chamado criado com sucesso! Código do chamado: ${novoChamado.codigo}`);  
+        
+        // Registrar log após criação do chamado  
+        await this.registrarLog(novoChamado.codigo, "Chamado criado", this.chamado.responsavel);  
+        
         this.limparFormulario();  
 
       } catch (e) {  
         alert("Erro ao enviar chamado: " + e.message);  
       }  
+    },  
+    async registrarLog(chamadoId, descricao, usuario) {  
+      const db = getFirestore(app);  
+      const logsCollectionRef = collection(db, "logsChamados");  
+      await addDoc(logsCollectionRef, {  
+        chamadoId: chamadoId,  
+        descricao: descricao,  
+        usuario: usuario,  
+        timestamp: new Date().toISOString(),  
+      });  
     },  
     getCurrentDate() {  
       const today = new Date();  
@@ -126,7 +137,7 @@ export default {
       };  
       this.codigo = null;  
       this.erro = null;  
-      this.setResponsavel();  // Redefine o responsável após limpar o formulário  
+      this.setResponsavel();  
     }  
   }  
 }  

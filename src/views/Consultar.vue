@@ -4,6 +4,7 @@
 
     <!-- Formulário de Filtro -->  
     <form @submit.prevent="consultarChamados" class="consulta-form">  
+      <!-- Campos do formulário -->  
       <div class="form-group">  
         <label for="dataInicio">Data inicial da abertura:</label>  
         <input type="date" v-model="filtros.dataAberturaInicio" class="form-control" />  
@@ -83,7 +84,7 @@
 </template>  
 
 <script>  
-import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";  
+import { getFirestore, collection, query, where, getDocs, addDoc } from "firebase/firestore";  
 import { app } from '../firebaseConfig';  
 
 export default {  
@@ -150,6 +151,20 @@ export default {
       const q = query(chamadosRef, ...conditions);  
       const querySnapshot = await getDocs(q);  
       this.resultados = querySnapshot.docs.map(doc => doc.data());  
+
+      // Registrar log da consulta  
+      await this.registrarLogConsulta(loggedInUser, this.filtros);  
+    },  
+    async registrarLogConsulta(usuario, filtros) {  
+      const db = getFirestore(app);  
+      const logsCollectionRef = collection(db, "logsConsultas");  
+      const logData = {  
+        usuario: usuario,  
+        filtrosAplicados: { ...filtros },  
+        timestamp: new Date().toISOString()  
+      };  
+      
+      await addDoc(logsCollectionRef, logData);  
     },  
     limparFiltros() {  
       this.filtros = {  

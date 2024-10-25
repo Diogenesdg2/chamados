@@ -33,11 +33,6 @@
           <textarea v-model="tratamento" class="form-control" required></textarea>  
         </div>  
 
-        <div class="form-group">  
-          <label for="nomeResponsavel">Nome do Responsável pelo Fechamento:</label>  
-          <input type="text" v-model="nomeResponsavelFechamento" class="form-control" required />  
-        </div>  
-
         <button type="submit" class="btn-fechar">Fechar Chamado</button>  
       </form>  
     </div>  
@@ -45,7 +40,7 @@
 </template>  
 
 <script>  
-import { getFirestore, collection, query, where, getDocs, doc, updateDoc } from "firebase/firestore";  
+import { getFirestore, collection, query, where, getDocs, doc, updateDoc, addDoc } from "firebase/firestore";  
 import { app } from '../firebaseConfig';  
 
 export default {  
@@ -54,7 +49,7 @@ export default {
       chamadosAbertos: [],  
       chamadoSelecionado: null,  
       tratamento: '',  
-      nomeResponsavelFechamento: ''  
+      nomeResponsavelFechamento: '', // Armazena o nome do usuário logado  
     };  
   },  
   methods: {  
@@ -77,11 +72,12 @@ export default {
     selecionarChamado(chamado) {  
       this.chamadoSelecionado = chamado;  
       this.tratamento = ''; // Reinicia o campo de tratamento ao selecionar um novo chamado  
-      this.nomeResponsavelFechamento = ''; // Reinicia o nome do responsável  
     },  
 
     async tratarChamado() {  
       if (!this.chamadoSelecionado) return;  
+
+      const loggedInUser = localStorage.getItem('loggedInUser') || 'Usuário Desconhecido'; // Obtém o usuário logado   
 
       const db = getFirestore(app);  
       const chamadoRef = doc(db, "chamados", this.chamadoSelecionado.id);  
@@ -89,7 +85,7 @@ export default {
       await updateDoc(chamadoRef, {  
         aberto: false,  
         tratamento: this.tratamento,  
-        nomeResponsavelFechamento: this.nomeResponsavelFechamento,  
+        nomeResponsavelFechamento: loggedInUser,  // Usa o usuário logado  
         dataFechamento: new Date().toISOString().split('T')[0]  
       });  
 
@@ -98,6 +94,22 @@ export default {
       // Atualiza a lista de chamados abertos removendo o chamado tratado  
       this.chamadosAbertos = this.chamadosAbertos.filter(ch => ch.id !== this.chamadoSelecionado.id);  
       this.chamadoSelecionado = null; // Desseleciona o chamado atual  
+      
+      // Registrar log da manutenção  
+      await this.registrarLogManutencao(this.chamadoSelecionado, this.tratamento, loggedInUser);  
+    },  
+
+    async registrarLogManutencao(chamado, tratamento, loggedInUser) {  
+      const db = getFirestore(app);  
+      const logsCollectionRef = collection(db, "logsManutencao");  
+      const logData = {  
+        codigo: chamado.codigo,  
+        tratamentoRealizado: tratamento,  
+        responsavelFechamento: loggedInUser,  
+        dataFechamento: new Date().toISOString().split('T')[0]  
+      };  
+      
+      await addDoc(logsCollectionRef, logData);  
     }  
   },  
   mounted() {  
