@@ -59,7 +59,7 @@
 
     <!-- Exibição dos Resultados -->  
     <div v-if="resultados.length > 0" class="resultados-container">  
-  <h2>Resultados da Consulta:</h2>  
+      <h2>Resultados da Consulta:</h2>  
       <ul>  
         <li v-for="(chamado, index) in resultados" :key="index">  
           <p><strong>Código:</strong> {{ chamado.codigo }}</p>  
@@ -74,11 +74,11 @@
           </div>  
           <div v-else>  
             <p><strong>Data de Abertura:</strong> {{ chamado.dataAbertura }}</p>  
-          </div>
+          </div>  
           <hr>  
         </li>  
       </ul>  
-    </div>
+    </div>  
   </div>  
 </template>  
 
@@ -104,16 +104,28 @@ export default {
   methods: {  
     async consultarChamados() {  
       const db = getFirestore(app);  
-      const chamadosQuery = collection(db, 'chamados');  
+      const chamadosRef = collection(db, 'chamados');  
       const conditions = [];  
 
-      // Filtros para data de abertura  
-      if (this.filtros.dataAberturaInicio && this.filtros.dataAberturaFim) {  
+      const loggedInUser = localStorage.getItem('loggedInUser') || '';  
+
+      // Lista de usuários com acesso total  
+      const usuariosComAcessoTotal = ['Diogenes', 'Ricardo', 'Milena', 'Corinta'];  
+
+      // Verificar se o usuário tem acesso total      
+      if (!usuariosComAcessoTotal.includes(loggedInUser)) {  
+        conditions.push(where('responsavel', '==', loggedInUser)); // Restringe aos chamados do próprio usuário  
+      }  
+
+      // Aplicar condições de filtro  
+      if (this.filtros.dataAberturaInicio) {  
         conditions.push(where('dataAbertura', '>=', this.filtros.dataAberturaInicio));  
+      }  
+
+      if (this.filtros.dataAberturaFim) {  
         conditions.push(where('dataAbertura', '<=', this.filtros.dataAberturaFim));  
       }  
 
-      // Filtros para data de fechamento  
       if (this.filtros.dataFechamentoInicio) {  
         conditions.push(where('dataFechamento', '>=', this.filtros.dataFechamentoInicio));  
       }  
@@ -122,24 +134,21 @@ export default {
         conditions.push(where('dataFechamento', '<=', this.filtros.dataFechamentoFim));  
       }  
 
-      // Filtro por responsável  
       if (this.filtros.responsavel) {  
         conditions.push(where('responsavel', '==', this.filtros.responsavel));  
       }  
 
-      // Filtro pelo estado do chamado  
       if (this.filtros.aberto !== null) {  
         conditions.push(where('aberto', '==', this.filtros.aberto));  
       }  
 
-      // Filtro por departamento  
       if (this.filtros.departamento) {  
         conditions.push(where('departamento', '==', this.filtros.departamento));  
       }  
 
-      const q = query(chamadosQuery, ...conditions);  
+      // Executar a consulta com as condições estabelecidas  
+      const q = query(chamadosRef, ...conditions);  
       const querySnapshot = await getDocs(q);  
-
       this.resultados = querySnapshot.docs.map(doc => doc.data());  
     },  
     limparFiltros() {  

@@ -47,7 +47,7 @@
         username: '',  
         password: '',  
         newUsername: '',  
-        newEmail: '', // Campo para o e-mail  
+        newEmail: '',  
         newPassword: '',  
         showRegister: false  
       };  
@@ -96,14 +96,14 @@
           }  
     
           await addDoc(usuariosRef, {  
-            username: this.newUsername,  // Nome do usuário armazenado conforme inserido  
-            email: this.newEmail, // Armazena o e-mail no Firestore  
+            username: this.newUsername,  
+            email: this.newEmail,  
             password: this.newPassword  
           });  
     
           alert('Cadastro bem-sucedido!');  
           this.newUsername = '';  
-          this.newEmail = ''; // Limpa o campo de e-mail  
+          this.newEmail = '';  
           this.newPassword = '';  
           this.toggleRegister();  
         } catch (error) {  

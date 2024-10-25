@@ -2,16 +2,16 @@
   <nav class="navbar">  
     <ul class="nav-list">  
       <li class="nav-item" v-if="loggedInUser">  
+        <span class="nav-link">Bem-vindo, {{ loggedInUser }}</span>  
+      </li>  
+      <li class="nav-item" v-if="loggedInUser">  
         <router-link to="/cadastro" class="nav-link">Home</router-link>  
       </li>  
       <li class="nav-item" v-if="loggedInUser">  
         <router-link to="/consultar" class="nav-link">Consultar</router-link>  
       </li>  
-      <li class="nav-item" v-if="loggedInUser">  
+      <li class="nav-item" v-if="mostrarMenuManutencao">  
         <router-link to="/manutencao" class="nav-link">Manutenção</router-link>  
-      </li>  
-      <li class="nav-item" v-if="loggedInUser">  
-        <span class="nav-link">Bem-vindo, {{ loggedInUser }}</span>  
       </li>  
       <li class="nav-item" v-if="loggedInUser">  
         <a href="#" @click.prevent="logOff" class="nav-link">Sair</a>  
@@ -21,7 +21,7 @@
 </template>  
 
 <script>  
-import { ref, onMounted } from 'vue';  
+import { ref, computed, onMounted } from 'vue';  
 import { useRouter } from 'vue-router';  
 
 export default {  
@@ -29,6 +29,12 @@ export default {
   setup() {  
     const router = useRouter();  
     const loggedInUser = ref('');  
+
+    const usuariosComAcessoTotal = ['Diogenes', 'Ricardo', 'Milena', 'Corinta'];  
+
+    const mostrarMenuManutencao = computed(() => {  
+      return usuariosComAcessoTotal.includes(loggedInUser.value);  
+    });  
 
     onMounted(() => {  
       loggedInUser.value = localStorage.getItem('loggedInUser') || '';  
@@ -43,6 +49,7 @@ export default {
 
     return {  
       loggedInUser,  
+      mostrarMenuManutencao,  
       logOff  
     };  
   }  
