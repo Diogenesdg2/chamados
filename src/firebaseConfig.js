@@ -7,12 +7,12 @@ import { getFirestore } from 'firebase/firestore';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyDzv8_jgbN6fe9RC2vR6L8Y3UKU9-hQfQw",
-  authDomain: "chamados-eebd0.firebaseapp.com",
-  projectId: "chamados-eebd0",
-  storageBucket: "chamados-eebd0.appspot.com",
-  messagingSenderId: "897329428905",
-  appId: "1:897329428905:web:c9f1ba62b623e5b2c96cb8"
+  apiKey: "AIzaSyDelp-W-zGnoI-37cIe41vlCXgxS7JM78k",
+  authDomain: "chamadosviman.firebaseapp.com",
+  projectId: "chamadosviman",
+  storageBucket: "chamadosviman.appspot.com",
+  messagingSenderId: "103714608447",
+  appId: "1:103714608447:web:a5823924d71c2722f16f8a"
 };
 
 // Initialize Firebase
